@@ -7,14 +7,14 @@ function range(hi: number) {
   return Array(hi).fill(0).map((_, i) => i);
 }
 
-function Cell({ children }: PropsWithChildren<{}>): React.ReactElement {
+function Cell({ children, selected, onClick }: PropsWithChildren<{selected: boolean, onClick(): void}>): React.ReactElement {
   const { fontSize, ref } = useFitText({maxFontSize: 500});
   return (
-    <div className="border-4 border-sky-800">
+    <div className={`border-4 border-sky-800 ${selected ? 'bg-gray-400': 'bg-white'}`} onClick={onClick}>
       {/* now this is professional programming */}
-      <span ref={ref} aria-hidden="true" className="absolute w-32 h-32 p-2 opacity-0 select-none -z-50" style={{ fontSize }}>{children}</span>
-      <div className="bg-white w-32 h-32 flex flex-col grow items-center justify-center">
-        <span className="text-sky-800 text-center p-2" style={{ fontSize }}>{children}</span>
+      <span ref={ref} aria-hidden="true" className="absolute w-[16vw] h-[16vw] lg:w-32 lg:h-32 md:p-2 opacity-0 select-none -z-50" style={{ fontSize }}>{children}</span>
+      <div className="w-[16vw] h-[16vw] lg:w-32 lg:h-32 flex flex-col grow items-center justify-center">
+        <span className="text-sky-800 text-center md:p-2" style={{ fontSize }}>{children}</span>
       </div>
     </div>
   );
@@ -24,12 +24,15 @@ function Row({ children }: PropsWithChildren<{}>): React.ReactElement {
   return <span className="flex">{children}</span>
 }
 
-function Grid({ width, height, entries }: { width: number, height: number, entries: string[] }): React.ReactElement {
+function Grid({ width, height, entries, selected, onClick }: { width: number, height: number, entries: string[], selected: {[key: string]: boolean}, onClick(coord: string): void }): React.ReactElement {
+  console.log(selected);
   return <div className="flex flex-col border-4 border-sky-800">
     {
       range(height).map(y => (
         <Row key={`${y}`}>{range(width).map(x => (
-          <Cell key={`${x},${y}_${entries[y*width+x]}`}>{entries[y * width + x] || ""}</Cell>
+          <Cell key={`${x},${y}_${entries[y*width+x]}`}
+          selected={selected[`${x},${y}`]}
+          onClick={() => {console.log(x, y); onClick(`${x},${y}`)}}>{entries[y * width + x] || ""}</Cell>
         ))}</Row>
       ))
     }
@@ -69,6 +72,7 @@ function App() {
   const [title, setTitle] = useState("");
   const [centercell, setCentercell] = useState("");
   const [entries, setEntries] = useState("");
+  const [selected, setSelected] = useState<{[key: string]: boolean}>({});
 
   useEffect(() => {
     const initialState = loadUrlState();
@@ -122,8 +126,8 @@ function App() {
         </section>
 
         <section className="flex flex-col grow items-center justify-center bg-gradient-to-br from-indigo-500 to-indigo-200">
-          <h2 className="font-sans text-5xl font-bold leading-[4rem]">{title}</h2>
-          <Grid width={gridSize} height={gridSize} entries={gridCells} />
+          <h2 className="font-sans lg:text-5xl font-bold lg:leading-[4rem]">{title}</h2>
+          <Grid width={gridSize} height={gridSize} entries={gridCells}  selected={selected} onClick={coord => setSelected({...selected, [coord]: !selected[coord]})} />
         </section>
       </main>
     </div>
