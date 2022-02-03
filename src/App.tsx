@@ -72,6 +72,7 @@ function App() {
 
   useEffect(() => {
     const initialState = loadUrlState();
+    console.log("Loaded state ", initialState)
     setTitle(initialState?.title || "Bingo");
     setCentercell(initialState?.centercell || "FREE");
     setEntries(initialState?.entries || range(24).map(i => `${i+1}`).join("\n"));
@@ -94,8 +95,8 @@ function App() {
       <header className="bg-slate-900 flex justify-center p-4">
         <span className="text-white text-3xl font-bold">Bingo generator</span>
       </header>
-      <main className="flex h-full">
-        <section className="w-2/5 flex flex-col items-center bg-gray-400">
+      <main className="flex flex-col lg:flex-row h-full">
+        <section className="lg:w-2/5 flex flex-col items-center bg-gray-400">
           <form className="flex flex-col w-4/5 h-full" onSubmit={e => e.preventDefault()}>
             <label className="flex flex-col mb-4">
               <span className="font-bold">Bingo title</span>
